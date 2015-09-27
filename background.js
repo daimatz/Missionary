@@ -1,15 +1,14 @@
 var menus = [];
 
-var App = function(name, token) {
-  this.name = name;
-  this.token = token;
+var App = function(account) {
+  this.account = account;
 }
 App.prototype.postNotification = function(message, url) {
   return chrome.notifications.create(
     null,
     {
       type: "basic",
-      title: this.name,
+      title: this.account.name,
       message: message,
       iconUrl: "icon.png"
     },
@@ -22,9 +21,9 @@ App.prototype.postNotification = function(message, url) {
     }.bind(this)
   );
 };
-App.prototype.createRealtime = function(callback) {
+App.prototype.createRealTimeSession = function(onSuccess, onError) {
   var xhr = new XMLHttpRequest();
-  var url = "https://slack.com/api/rtm.start?token=" + this.token;
+  var url = "https://slack.com/api/rtm.start?token=" + this.account.token;
   xhr.open("GET", url, true);
   xhr.onload = function(e) {
     if (xhr.readyState == 4) {
@@ -32,22 +31,26 @@ App.prototype.createRealtime = function(callback) {
         var res = xhr.responseText;
         var json = JSON.parse(res);
         var ws = new WebSocket(json.url);
-        if (callback) {
-          callback(ws);
-        }
+        if (onSuccess) { onSuccess(ws); }
       } else {
       }
     }
   }.bind(this);
   xhr.send();
 };
+App.prototype.setWsHandlers = function(ws) {
+  ws.onmessage = function(e) {
+    var json = JSON.parse(e.data);
+    if (!json.hidden) {
+      this.postNotification(
+        json.text,
+        'https://' + this.account.name + '.slack.com'
+      );
+    }
+  }.bind(this);
+};
 App.prototype.run = function() {
-  this.createRealtime(function(ws) {
-    this.postNotification(
-        "WebSocket URL is: " + ws.url,
-        "http://www.google.com"
-    );
-  }.bind(this));
+  this.createRealtimeSession(this.setWsHandlers.bind(this));
 };
 
 var reload = function(info, tab) {
@@ -65,7 +68,7 @@ var reload = function(info, tab) {
         "title": account.name,
         "contexts": ["browser_action"],
         "onclick": function() {
-          var app = new App(account.name, account.token);
+          var app = new App(account);
           app.run();
         }
       }));
