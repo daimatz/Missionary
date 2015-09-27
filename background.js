@@ -1,6 +1,7 @@
 var menus = [];
 
-var App = function(token) {
+var App = function(name, token) {
+  this.name = name;
   this.token = token;
 }
 App.prototype.postNotification = function(message, url) {
@@ -8,7 +9,7 @@ App.prototype.postNotification = function(message, url) {
     null,
     {
       type: "basic",
-      title: this.token,
+      title: this.name,
       message: message,
       iconUrl: "icon.png"
     },
@@ -18,7 +19,7 @@ App.prototype.postNotification = function(message, url) {
           window.open(url);
         }
       });
-    }
+    }.bind(this)
   );
 };
 App.prototype.createRealtime = function(callback) {
@@ -37,7 +38,7 @@ App.prototype.createRealtime = function(callback) {
       } else {
       }
     }
-  };
+  }.bind(this);
   xhr.send();
 };
 App.prototype.run = function() {
@@ -57,14 +58,14 @@ var reload = function(info, tab) {
       "contexts": ["browser_action"],
       "onclick" : reload
     }));
-    var tokens = (localStorage['tokens'] || '').split(' ');
-    for (var i = 0; i < tokens.length; i++) {
-      var token = tokens[i];
+    var accounts = JSON.parse(localStorage['accounts'] || '[]');
+    for (var i = 0; i < accounts.length; i++) {
+      var account = accounts[i];
       menus.push(chrome.contextMenus.create({
-        "title": token,
+        "title": account.name,
         "contexts": ["browser_action"],
         "onclick": function() {
-          var app = new App(token);
+          var app = new App(account.name, account.token);
           app.run();
         }
       }));
