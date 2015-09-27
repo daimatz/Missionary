@@ -3,7 +3,11 @@
   "name": "Missionary",
   "description": "Yet Another Slack Notifier for Chrome",
   "version": "0.1",
-  "permissions": ["contextMenus", "notifications"],
+  "permissions": [
+    "contextMenus",
+    "notifications",
+    "https://slack.com/*"
+  ],
   "background": {
     "scripts": ["background.js"]
   },
