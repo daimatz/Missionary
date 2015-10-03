@@ -1,88 +1,85 @@
-var createAccountForm = function(account) {
-  var accountDiv = document.createElement('div');
-  accountDiv.className = 'account';
+import Account from './account';
 
-  var nameDiv = document.createElement('div');
-  nameDiv.className = 'name';
-  var nameSpan = document.createElement('span');
-  nameSpan.className = 'name';
-  nameSpan.innerHTML = 'name: ';
-  var nameInput = document.createElement('input');
-  nameInput.className = 'name';
-  nameInput.type = 'text';
-  if (account) { nameInput.value = account.name; }
+class Options {
+  createAccountForm(account) {
+    let accountDiv = document.createElement('div');
+    accountDiv.className = 'account';
 
-  nameDiv.appendChild(nameSpan);
-  nameDiv.appendChild(nameInput);
+    let nameDiv = document.createElement('div');
+    nameDiv.className = 'name';
+    let nameSpan = document.createElement('span');
+    nameSpan.className = 'name';
+    nameSpan.innerHTML = 'name: ';
+    let nameInput = document.createElement('input');
+    nameInput.className = 'name';
+    nameInput.type = 'text';
+    if (account) { nameInput.value = account.name; }
 
-  var tokenDiv = document.createElement('div');
-  tokenDiv.className = 'token';
-  var tokenSpan = document.createElement('span');
-  tokenSpan.innerHTML = 'token: ';
-  var tokenInput = document.createElement('input');
-  tokenInput.className = 'token';
-  tokenInput.type = 'text';
-  if (account) { tokenInput.value = account.token; }
+    nameDiv.appendChild(nameSpan);
+    nameDiv.appendChild(nameInput);
 
-  tokenDiv.appendChild(tokenSpan);
-  tokenDiv.appendChild(tokenInput);
+    let tokenDiv = document.createElement('div');
+    tokenDiv.className = 'token';
+    let tokenSpan = document.createElement('span');
+    tokenSpan.innerHTML = 'token: ';
+    let tokenInput = document.createElement('input');
+    tokenInput.className = 'token';
+    tokenInput.type = 'text';
+    if (account) { tokenInput.value = account.token; }
 
-  accountDiv.appendChild(nameDiv);
-  accountDiv.appendChild(tokenDiv);
+    tokenDiv.appendChild(tokenSpan);
+    tokenDiv.appendChild(tokenInput);
 
-  return accountDiv;
-};
+    accountDiv.appendChild(nameDiv);
+    accountDiv.appendChild(tokenDiv);
 
-var createAddButton = function(parentNode) {
-  var div = document.createElement('div');
-  div.className = 'add';
-  var button = document.createElement('button');
-  button.onclick = function() {
-    parentNode.appendChild(createAccountForm(null));
-  };
-  button.innerHTML = 'add account';
-  div.appendChild(button);
-  return div;
-};
-
-var createSaveButton = function() {
-  var div = document.createElement('div');
-  div.className = 'save';
-  var button = document.createElement('button');
-  button.onclick = function() {
-    var accountDivs = document.querySelectorAll('div.account');
-    var accounts = [];
-    for (var i = 0; i < accountDivs.length; i++) {
-      var div = accountDivs[i];
-      var name = div.querySelectorAll('input.name')[0].value;
-      var token = div.querySelectorAll('input.token')[0].value;
-      if (name !== '' && token !== '') {
-        accounts.push({
-          name: name,
-          token: token
-        });
-      }
-    }
-    localStorage['accounts'] = JSON.stringify(accounts);
-  };
-  button.innerHTML = 'save';
-  div.appendChild(button);
-  return div;
-};
-
-var main = function() {
-  var body = document.getElementById('body');
-  var accountsDiv = document.createElement('div');
-
-  var accounts = JSON.parse(localStorage['accounts'] || '[]');
-  for (var i = 0; i < accounts.length; i++) {
-    accountsDiv.appendChild(createAccountForm(accounts[i]));
+    return accountDiv;
   }
 
-  accountsDiv.appendChild(createAccountForm(null));
-  body.appendChild(accountsDiv);
-  body.appendChild(createAddButton(accountsDiv));
-  body.appendChild(createSaveButton());
-};
+  createAddButton(parentNode) {
+    let div = document.createElement('div');
+    div.className = 'add';
+    let button = document.createElement('button');
+    button.onclick = () => parentNode.appendChild(this.createAccountForm(null));
+    button.innerHTML = 'add account';
+    div.appendChild(button);
+    return div;
+  }
 
-window.onload = main;
+  createSaveButton() {
+    let div = document.createElement('div');
+    div.className = 'save';
+    let button = document.createElement('button');
+    button.onclick = () => {
+      let accountDivs = document.querySelectorAll('div.account');
+      let accounts = [];
+      for (let i = 0; i < accountDivs.length; i++) {
+        let div = accountDivs[i];
+        let name = div.querySelectorAll('input.name')[0].value;
+        let token = div.querySelectorAll('input.token')[0].value;
+        if (name !== '' && token !== '') { accounts.push({name, token}); }
+      }
+      localStorage['accounts'] = JSON.stringify(accounts);
+    };
+    button.innerHTML = 'save';
+    div.appendChild(button);
+    return div;
+  }
+
+  main() {
+    let body = document.getElementById('body');
+    let accountsDiv = document.createElement('div');
+
+    let accounts = JSON.parse(localStorage['accounts'] || '[]');
+    for (let i = 0; i < accounts.length; i++) {
+      accountsDiv.appendChild(this.createAccountForm(accounts[i]));
+    }
+
+    accountsDiv.appendChild(this.createAccountForm(null));
+    body.appendChild(accountsDiv);
+    body.appendChild(this.createAddButton(accountsDiv));
+    body.appendChild(this.createSaveButton());
+  }
+}
+
+window.onload = new Options().main();
