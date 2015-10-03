@@ -1,0 +1,25 @@
+{
+  "name": "missionary",
+  "version": "0.1.0",
+  "description": "Yet Another Slack Notifier for Chrome",
+  "main": "main.js",
+  "scripts": {
+    "build": "gulp build"
+  },
+  "devDependencies": {
+      "babelify": "6.3.0",
+      "browserify": "11.2.0",
+      "gulp": "3.9.0",
+      "vinyl-source-stream": "1.1.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/daimatz/Missionary.git"
+  },
+  "author": "daimatz",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/daimatz/Missionary/issues"
+  },
+  "homepage": "https://github.com/daimatz/Missionary#readme"
+}
