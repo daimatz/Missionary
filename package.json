@@ -4,11 +4,13 @@
   "description": "Yet Another Slack Notifier for Chrome",
   "main": "main.js",
   "scripts": {
-    "build": "gulp build"
+    "build": "gulp build",
+    "clean": "gulp clean"
   },
   "devDependencies": {
       "babelify": "6.3.0",
       "browserify": "11.2.0",
+      "del": "2.0.2",
       "gulp": "3.9.0",
       "vinyl-source-stream": "1.1.0"
   },

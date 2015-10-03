@@ -7,4 +7,5 @@ npm install
 npm run build
 ```
 
-then "Load unpacked extension..." and choose `app/` directory.
+then click "Load unpacked extension..." button on your Chrome
+and choose `build/app/` directory.
