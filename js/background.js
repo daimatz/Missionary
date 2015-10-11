@@ -1,4 +1,3 @@
-import Account from './account';
 import Worker from './worker';
 
 class Background {
@@ -16,7 +15,7 @@ class Background {
       }));
       let accounts = JSON.parse(localStorage['accounts'] || '[]');
       for (let i = 0; i < accounts.length; i++) {
-        let account = new Account(accounts[i]);
+        let account = accounts[i];
         this.menus.push(chrome.contextMenus.create({
           "title": account.name,
           "contexts": ["browser_action"],

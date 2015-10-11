@@ -1,5 +1,3 @@
-import Account from './account';
-
 class Options {
   createAccountForm(account) {
     let accountDiv = document.createElement('div');

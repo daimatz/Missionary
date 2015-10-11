@@ -1,5 +1,3 @@
-import Account from './account';
-
 export default class Worker {
   constructor(account) {
     this.account = account;

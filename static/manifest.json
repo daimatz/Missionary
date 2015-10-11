@@ -9,7 +9,7 @@
     "https://slack.com/*"
   ],
   "background": {
-    "scripts": ["app/background-bundle.js"]
+    "scripts": ["background-bundle.js"]
   },
   "browser_action": {
     "default_icon": "icon.png"
@@ -20,5 +20,5 @@
   "web_accessible_resources": [
     "icon.png"
   ],
-  "options_page": "app/options.html"
+  "options_page": "options.html"
 }
