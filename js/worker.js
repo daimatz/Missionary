@@ -1,4 +1,5 @@
 import Message from './message';
+const ReconnectingWebSocket = require('../node_modules/ReconnectingWebSocket/reconnecting-websocket');
 
 export default class Worker {
   constructor(account) {
@@ -24,6 +25,12 @@ export default class Worker {
     );
   }
 
+  onclose(ev) {
+  }
+
+  onerror(ev) {
+  }
+
   onmessage(ev) {
     let message = new Message(this.account, JSON.parse(ev.data));
     if (message.shouldNotify()) {
@@ -31,19 +38,25 @@ export default class Worker {
     }
   }
 
+  onopen(ev) {
+  }
+
   setWsHandlers(ws) {
+    ws.onclose = this.onclose.bind(this);
+    ws.onerror = this.onerror.bind(this);
     ws.onmessage = this.onmessage.bind(this);
+    ws.onopen = this.onopen.bind(this);
   }
 
   createRealTimeSession() {
     let url = "https://slack.com/api/rtm.start?token=" + this.account.token;
     return fetch(url)
       .then(res => res.json())
-      .then(json => new WebSocket(json.url));
+      .then(json => new ReconnectingWebSocket(json.url))
+      .then(this.setWsHandlers.bind(this));
   }
 
   main() {
     this.createRealTimeSession()
-      .then(this.setWsHandlers.bind(this));
   }
 }
