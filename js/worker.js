@@ -1,5 +1,4 @@
 import Message from './message';
-const ReconnectingWebSocket = require('../node_modules/ReconnectingWebSocket/reconnecting-websocket');
 
 export default class Worker {
   constructor(account) {
@@ -15,7 +14,7 @@ export default class Worker {
         message: message.getText(),
         iconUrl: "icon.png"
       },
-      (createdId) => {
+      createdId => {
         chrome.notifications.onClicked.addListener(clickedId => {
           if (createdId === clickedId) {
             window.open(message.getUrl());
@@ -25,35 +24,53 @@ export default class Worker {
     );
   }
 
-  onclose(ev) {
+  onclose(ws, ev) {
   }
 
-  onerror(ev) {
+  onerror(ws, ev) {
+    console.log("error. reconnecting...");
+    ws.close();
+    this.createRealTimeSession();
   }
 
-  onmessage(ev) {
-    let message = new Message(this.account, JSON.parse(ev.data));
+  onmessage(ws, ev) {
+    console.log("onmessage: " + ev.data);
+    let json = JSON.parse(ev.data);
+    let message = new Message(this.account, json);
     if (message.shouldNotify()) {
       this.postNotification(message);
     }
   }
 
-  onopen(ev) {
+  onopen(ws, ev) {
+    console.log("connected!");
   }
 
   setWsHandlers(ws) {
-    ws.onclose = this.onclose.bind(this);
-    ws.onerror = this.onerror.bind(this);
-    ws.onmessage = this.onmessage.bind(this);
-    ws.onopen = this.onopen.bind(this);
+    ws.onclose = ev => {
+      this.onclose(ws, ev);
+    }.bind(this);
+    ws.onerror = ev => {
+      this.onerror(ws, ev);
+    }.bind(this);
+    ws.onmessage = ev => {
+      this.onmessage(ws, ev);
+    }.bind(this);
+    ws.onopen = ev => {
+      this.onopen(ws, ev);
+    }.bind(this);
   }
 
   createRealTimeSession() {
     let url = "https://slack.com/api/rtm.start?token=" + this.account.token;
     return fetch(url)
       .then(res => res.json())
-      .then(json => new ReconnectingWebSocket(json.url))
-      .then(this.setWsHandlers.bind(this));
+      .then(json => new WebSocket(json.url))
+      .then(this.setWsHandlers.bind(this))
+      .catch(e => {
+        console.log("failed to create ws session. try 1 mintute after...");
+        setTimeout(this.createRealTimeSession.bind(this), 60000);
+      }.bind(this));
   }
 
   main() {
